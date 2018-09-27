@@ -20,6 +20,7 @@ function dirsize( $d ) {
   return $size; 
 }
 
+
 function clear_files($dir,$expire_time,$max_file_size)
 {
 // переводим дни в секунды
@@ -56,4 +57,59 @@ if (is_dir($dir))
 	}
 }
  
+}
+
+
+function clear_history() {
+$properties = SQLSelect("SELECT * FROM properties WHERE KEEP_HISTORY>0");
+   $cnt=count($properties);
+   for($i=0; $i<$cnt; $i++) {
+   		$propid=$properties[$i]['ID'];
+    	$keep=$properties[$i]['KEEP_HISTORY'];
+    	$pvals=SQLSelect("SELECT * FROM pvalues WHERE PROPERTY_ID=$propid");
+    	$cnt2=count($pvals);
+    		for ($j=0; $j<$cnt2; $j++) {
+            $id=$pvals[$j]['ID'];
+            SQLExec("DELETE FROM phistory WHERE VALUE_ID=$id AND ADDED < DATE_SUB(NOW(), INTERVAL $keep DAY)");
+            }
+   }
+
+// Оптимизация таблицы phistory БД
+safe_exec("mysqlcheck -o db_terminal phistory -u ".DB_USER." -p".DB_PASSWORD);
+}
+
+
+function backup_majordomo($type) {
+chdir(dirname(__FILE__) . '/../../');
+
+include_once("./config.php");
+include_once("./lib/loader.php");
+include_once("./lib/threads.php");
+
+// connecting to database
+$db = new mysql(DB_HOST, '', DB_USER, DB_PASSWORD, DB_NAME);
+
+include_once("./load_settings.php");
+include_once(DIR_MODULES . "saverestore/saverestore.class.php");
+
+$sv=new saverestore();
+
+global $design;
+global $code;
+global $data;
+global $save_files;
+if ($type=="db") {
+$design=1;
+$code=1;
+$data=1;
+$save_files=1;
+} else {
+$design=0;
+$code=0;
+$data=1;
+$save_files=0;	
+}
+
+$res=$sv->dump($out, 1);
+$sv->removeTree(ROOT.'cms/saverestore/temp');
 }
