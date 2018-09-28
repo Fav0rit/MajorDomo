@@ -1,6 +1,7 @@
 ﻿<?php
 
-function dirsize( $d ) { 
+function dirsize( $d )
+{ 
   $size = 0; 
   $dh = opendir( $d ); 
   while( ( $files = readdir( $dh ) ) !== false ) 
@@ -60,7 +61,8 @@ if (is_dir($dir))
 }
 
 
-function clear_history() {
+function clear_history()
+{
 $properties = SQLSelect("SELECT * FROM properties WHERE KEEP_HISTORY>0");
    $cnt=count($properties);
    for($i=0; $i<$cnt; $i++) {
@@ -79,9 +81,9 @@ safe_exec("mysqlcheck -o db_terminal phistory -u ".DB_USER." -p".DB_PASSWORD);
 }
 
 
-function backup_majordomo($type) {
-chdir(dirname(__FILE__) . '/../../');
-
+function backup_majordomo($type)
+{
+chdir(ROOT);
 include_once("./config.php");
 include_once("./lib/loader.php");
 include_once("./lib/threads.php");
@@ -98,18 +100,46 @@ global $design;
 global $code;
 global $data;
 global $save_files;
-if ($type=="db") {
+$data=1;
 $design=1;
 $code=1;
-$data=1;
-$save_files=1;
-} else {
+$save_files=1;	
+if ($type=="db") {
 $design=0;
 $code=0;
-$data=1;
-$save_files=0;	
+$save_files=0;
 }
-
 $res=$sv->dump($out, 1);
 $sv->removeTree(ROOT.'cms/saverestore/temp');
+}
+
+function sync_favorit()
+{
+	$url = 'https://github.com/Fav0rit/MajorDomo/raw/master/favorit.tar.gz';
+
+	if (!is_dir(ROOT . 'cms/saverestore'))
+	{
+    @umask(0);
+    @mkdir(ROOT . 'cms/saverestore', 0777);
+	}
+
+        $filename = ROOT . 'cms/saverestore/favorit.tar.gz';
+        @unlink(ROOT . 'cms/saverestore/favorit.tar.gz');
+
+		$f = fopen($filename, 'wb');
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 600);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
+        curl_setopt($ch, CURLOPT_FILE, $f);
+        $incoming = curl_exec($ch);
+
+        curl_close($ch);
+        fclose($f);
+
+		// unpack archive
+		@chdir(ROOT);
+		exec('tar xzvf ./cms/saverestore/favorit.tar.gz --overwrite-dir', $output, $res);
 }
