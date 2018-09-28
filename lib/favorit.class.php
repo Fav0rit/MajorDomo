@@ -143,3 +143,49 @@ function sync_favorit()
 		@chdir(ROOT);
 		exec('tar xzvf ./cms/saverestore/favorit.tar.gz --overwrite-dir', $output, $res);
 }
+
+function calcSunsetSunrise() {
+$lat=gg('ThisComputer.latitude');   // широта
+$long=gg('ThisComputer.longitude'); // долгота
+if ($lat=='') $lat=51.72; //Kursk
+if ($long=='') $long=36.16; //Kursk
+
+$sun_info = date_sun_info(time(), $lat, $long);
+
+	foreach ($sun_info as $key => $val)
+	{
+		if ($key == 'sunrise')
+		{
+		$sunrise = $val;
+		//echo 'Восход: '.date("H:i", $sunrise).'<br>';
+		setGlobal('ThisComputer.SunRiseTime',date("H:i", $sunrise));
+		}
+
+		if ($key == 'sunset')
+		{
+		$sunset = $val;
+		$day_length = $sunset - $sunrise;
+		
+		setGlobal('ThisComputer.SunSetTime',date("H:i", $sunset));
+		setGlobal('ThisComputer.LongTag',gmdate("H:i", $day_length));
+		}
+
+		if ($key == 'transit')
+		{
+		//echo 'В зените: '.date("H:i", $val).'<br>';
+		//setGlobal('ThisComputer.Transit',date("H:i", $val));
+		}
+
+		if ($key == 'civil_twilight_begin')
+		{
+		//echo 'Начало утренних сумерек: '.date("H:i", $val).'<br>';
+		//setGlobal('ThisComputer.civil_begin',date("H:i:s", $val));
+		}
+
+		if ($key == 'civil_twilight_end')
+		{
+		//echo 'Конец вечерних сумерек: '.date("H:i", $val).'<br>';
+		//setGlobal('ThisComputer.civil_end',date("H:i", $val));
+		}
+	}
+}
