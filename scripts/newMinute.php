@@ -4,7 +4,7 @@ $h=(int)date('G',time());
 $m=date('i',time());
 
 // Рассчитываем время восхода и захода Солнца
-if (timeIs("02:30")) {
+if (timeIs("01:00")) {
 	calcSunsetSunrise();
 }
 
