@@ -3,6 +3,11 @@
 $h=(int)date('G',time());
 $m=date('i',time());
 
+// Рассчитываем время восхода и захода Солнца
+if (timeIs("02:30")) {
+	calcSunsetSunrise();
+}
+
 // Делаем бэкап базы данных
 if (timeIs("02:30")) {
 	backup_majordomo("db");
