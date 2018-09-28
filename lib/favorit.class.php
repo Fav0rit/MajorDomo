@@ -142,6 +142,8 @@ function sync_favorit()
 		// unpack archive
 		@chdir(ROOT);
 		exec('tar xzvf ./cms/saverestore/favorit.tar.gz --overwrite-dir', $output, $res);
+		
+	say("Синхронизация скриптов завершена",0);
 }
 
 function calcSunsetSunrise() {
