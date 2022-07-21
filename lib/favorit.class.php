@@ -110,7 +110,10 @@ function backup_majordomo($type,$ftp_backup)
 	$save_files=0;
 	}
 	$res=$sv->dump($out, 1);
-	$sv->removeTree(ROOT.'cms/saverestore/temp');
+	
+	include_once(DIR_MODULES . "market/market.class.php");
+    $mkt = new market();
+	$mkt->removeTree(ROOT.'cms/saverestore/temp');
 	
 	// Кидаем бэкап на ftp-сервер
 	if ($ftp_backup) {
