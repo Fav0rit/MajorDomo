@@ -1,6 +1,6 @@
 <?php
 
-$ver="06122018";
+$ver="21072022";
 if (gg("favoritVer")!=$ver)
 {
 	favoritInit();
